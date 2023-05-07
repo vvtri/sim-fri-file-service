@@ -1,4 +1,5 @@
-import { AudienceType, FileType, IsValidEnum } from 'common';
+import { IsValidEnum } from 'common';
+import { AudienceType, FileType } from 'shared';
 
 export class CreatePresignUrlUserReqDto {
   @IsValidEnum({ enum: FileType, required: true })

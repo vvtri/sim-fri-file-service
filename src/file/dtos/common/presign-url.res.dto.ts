@@ -1,4 +1,4 @@
-import { NonFunctionProperties } from 'common';
+import { NonFunctionProperties } from 'shared';
 import { FileResDto } from './file.res.dto';
 
 export class PresignUrlResDto {

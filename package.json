@@ -45,6 +45,7 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.14.0",
     "common": "git+https://github.com/vvtri/sim-fri-common.git#develop",
+    "shared": "git+https://github.com/vvtri/sim-fri-shared.git#develop",
     "dayjs": "1.11.7",
     "joi": "17.9.1",
     "jsonwebtoken": "9.0.0",

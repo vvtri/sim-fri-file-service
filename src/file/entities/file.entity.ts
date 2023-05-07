@@ -1,5 +1,6 @@
-import { AudienceType, BaseEntity, FileType } from 'common';
+import { AudienceType, FileType } from 'shared';
 import {
+  BaseEntity,
   Column,
   Entity,
   JoinColumn,
