@@ -2,7 +2,13 @@ import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { getFileCategory } from 'common';
+import { KafkaProducer } from '@vvtri/nestjs-kafka';
+import {
+  FileCreatedKafkaPayload,
+  FileUpdatedKafkaPayload,
+  KAFKA_TOPIC,
+  getFileCategory,
+} from 'common';
 import { FileType } from 'shared';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../../auth/entities/user.entity';
@@ -10,6 +16,7 @@ import { GlobalConfig } from '../../common/configs/global.config';
 import { FileResDto } from '../dtos/common/file.res.dto';
 import { PresignUrlResDto } from '../dtos/common/presign-url.res.dto';
 import { CreatePresignUrlUserReqDto } from '../dtos/user/req/file.user.req.dto';
+import { File } from '../entities/file.entity';
 import { FileRepository } from '../repositories/file.repository';
 
 @Injectable()
@@ -18,9 +25,8 @@ export class FileService {
   constructor(
     private configService: ConfigService<GlobalConfig>,
     private fileRepo: FileRepository,
+    private kafkaProducer: KafkaProducer,
   ) {
-    console.log('first', configService.getOrThrow('aws.accessKey'));
-    console.log('first2', configService.getOrThrow('aws.secretKet'));
     this.s3Client = new S3({
       credentials: {
         accessKeyId: configService.getOrThrow('aws.accessKey'),
@@ -54,6 +60,8 @@ export class FileService {
     });
     await this.fileRepo.save(file);
 
+    await this.sendFileCreatedKafka(file);
+
     return new PresignUrlResDto({
       file: FileResDto.forUser({ data: file }),
       presignedUrl,
@@ -69,5 +77,21 @@ export class FileService {
     }
 
     return `${fileCategory}/${userId}/${randomStr}.${fileType}`;
+  }
+
+  private async sendFileCreatedKafka(file: File) {
+    const kafkaPayload = new FileCreatedKafkaPayload(file);
+    await this.kafkaProducer.send<FileCreatedKafkaPayload>({
+      topic: KAFKA_TOPIC.FILE_CREATED,
+      messages: [{ value: kafkaPayload, headers: { id: String(file.id) } }],
+    });
+  }
+
+  private async sendFileUpdatedKafka(file: File) {
+    const kafkaPayload = new FileUpdatedKafkaPayload(file);
+    await this.kafkaProducer.send<FileUpdatedKafkaPayload>({
+      topic: KAFKA_TOPIC.FILE_UPDATED,
+      messages: [{ value: kafkaPayload, headers: { id: String(file.id) } }],
+    });
   }
 }
