@@ -10,6 +10,7 @@ import {
   getFileCategory,
 } from 'common';
 import { FileType } from 'shared';
+import { Transactional } from 'typeorm-transactional';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../../auth/entities/user.entity';
 import { GlobalConfig } from '../../common/configs/global.config';
@@ -36,6 +37,7 @@ export class FileService {
     });
   }
 
+  @Transactional()
   async createPresignUrl(dto: CreatePresignUrlUserReqDto, user: User) {
     const { fileType, audienceType } = dto;
 

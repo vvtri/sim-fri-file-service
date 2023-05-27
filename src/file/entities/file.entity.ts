@@ -1,17 +1,19 @@
+import { BaseEntity } from 'common';
 import { AudienceType, FileType } from 'shared';
 import {
-  BaseEntity,
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserProfile } from '../../auth/entities/user-profile.entity';
 import { User } from '../../auth/entities/user.entity';
 
 @Entity()
 export class File extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 255 })
@@ -37,4 +39,7 @@ export class File extends BaseEntity {
   @JoinColumn()
   user: User;
   // end join user
+
+  @OneToOne(() => UserProfile, (up) => up.avatar)
+  userProfile: UserProfile;
 }
