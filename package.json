@@ -40,7 +40,7 @@
     "@nestjs/swagger": "6.3.0",
     "@nestjs/typeorm": "9.0.1",
     "@types/bcryptjs": "2.4.2",
-    "@vvtri/nestjs-kafka": "1.1.4",
+    "@vvtri/nestjs-kafka": "1.1.5",
     "boolean": "3.2.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.0",
