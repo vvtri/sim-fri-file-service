@@ -47,6 +47,7 @@ export class FileService {
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: key,
+      ContentType: fileType,
     });
 
     const presignedUrl = await getSignedUrl(this.s3Client, command, {
@@ -86,6 +87,7 @@ export class FileService {
     await this.kafkaProducer.send<FileCreatedKafkaPayload>({
       topic: KAFKA_TOPIC.FILE_CREATED,
       messages: [{ value: kafkaPayload, headers: { id: String(file.id) } }],
+      acks: -1,
     });
   }
 
