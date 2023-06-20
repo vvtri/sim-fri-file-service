@@ -44,11 +44,7 @@ export class FileService {
     const key = this.genFileKey(fileType, user.id);
     const bucket = this.configService.getOrThrow('aws.bucket');
 
-    const command = new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      ContentType: fileType,
-    });
+    const command = new PutObjectCommand({ Bucket: bucket, Key: key });
 
     const presignedUrl = await getSignedUrl(this.s3Client, command, {
       expiresIn: 3600,
@@ -86,7 +82,7 @@ export class FileService {
     const kafkaPayload = new FileCreatedKafkaPayload(file);
     await this.kafkaProducer.send<FileCreatedKafkaPayload>({
       topic: KAFKA_TOPIC.FILE_CREATED,
-      messages: [{ value: kafkaPayload, headers: { id: String(file.id) } }],
+      messages: [{ value: kafkaPayload, key: String(file.id) }],
       acks: -1,
     });
   }
@@ -95,7 +91,7 @@ export class FileService {
     const kafkaPayload = new FileUpdatedKafkaPayload(file);
     await this.kafkaProducer.send<FileUpdatedKafkaPayload>({
       topic: KAFKA_TOPIC.FILE_UPDATED,
-      messages: [{ value: kafkaPayload, headers: { id: String(file.id) } }],
+      messages: [{ value: kafkaPayload, key: String(file.id) }],
     });
   }
 }
